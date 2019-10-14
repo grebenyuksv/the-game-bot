@@ -25,13 +25,6 @@ const startMessage = `Ласкаво прошу! Відповідайте мен
 
 bot.start(ctx => ctx.reply(startMessage));
 
-// bot.command('train', ctx => {
-//     console.log(JSON.stringify(ctx.message, null, 2));
-//     ctx.reply(
-//         'Напишіть населений пункт, звідки ви, і рівень вашої гри по шкалі від 0 до 10.',
-//     );
-// });
-
 // Create scene manager
 const stage = new Stage();
 
