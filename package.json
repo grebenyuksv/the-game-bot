@@ -1,10 +1,13 @@
 {
-  "name": "the-game-bot",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
-    "dotenv": "^8.1.0",
-    "telegraf": "^3.32.0"
-  }
+	"name": "the-game-bot",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"scripts": {
+		"start": "node src"
+	},
+	"dependencies": {
+		"dotenv": "^8.1.0",
+		"telegraf": "^3.32.0"
+	}
 }
