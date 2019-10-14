@@ -70,6 +70,11 @@ stage.register(
 );
 bot.command('host', ctx => ctx.scene.enter('host'));
 
+stage.register(
+    createSingleQuestionScene('ask', 'Напишіть питання:'),
+);
+bot.command('ask', ctx => ctx.scene.enter('ask'));
+
 bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
 bot.hears(/.*/, ctx => {
