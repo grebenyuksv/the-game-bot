@@ -31,36 +31,44 @@ const stage = new Stage();
 bot.use(session());
 bot.use(stage.middleware());
 
-// Train scene
-const train = new Scene('train');
-train.enter(ctx =>
-    ctx.reply(
+const createSingleQuestionScene = (commandName, question) => {
+    // Train scene
+    const scene = new Scene(commandName);
+    scene.enter(ctx => ctx.reply(question));
+    scene.hears(/.*/, async ctx => {
+        const forwardMessage = await telegram.forwardMessage(
+            ADMIN_GROUP_CHAT_ID,
+            ctx.message.chat.id,
+            ctx.message.message_id,
+        );
+        const message = await telegram.sendMessage(
+            ADMIN_GROUP_CHAT_ID,
+            `Там була команда "${commands[commandName]}". Уважно: відповідайте саме на ТЕ повідомлення, не на це. Цей костиль я зробив, тому що не знайшов у API телеграма іншого способу дописати в те повідомлення команду, яку юзер обрав.`,
+            {
+                reply_to_message_id: forwardMessage.message_id,
+            },
+        );
+        console.log(`Forwarded to admins`);
+        ctx.scene.leave();
+    });
+    scene.leave(ctx => {
+        ctx.reply('Дякую, я скоро відповім!');
+    });
+    return scene;
+};
+
+stage.register(
+    createSingleQuestionScene(
+        'train',
         'Напишіть населений пункт, звідки ви, і рівень вашої гри по шкалі від 0 до 10:',
     ),
 );
-train.hears(/.*/, async ctx => {
-    const forwardMessage = await telegram.forwardMessage(
-        ADMIN_GROUP_CHAT_ID,
-        ctx.message.chat.id,
-        ctx.message.message_id,
-    );
-    const message = await telegram.sendMessage(
-        ADMIN_GROUP_CHAT_ID,
-        `Там була команда "${commands.train}"`,
-        {
-            reply_to_message_id: forwardMessage.message_id,
-        },
-    );
-    console.log(`Forwarded to admins`);
-    ctx.scene.leave();
-});
-train.leave(ctx => {
-    ctx.reply('Дякую, я скоро відповім!');
-});
-
-stage.register(train);
-
 bot.command('train', ctx => ctx.scene.enter('train'));
+
+stage.register(
+    createSingleQuestionScene('host', 'Напишіть населений пункт, звідки ви:'),
+);
+bot.command('host', ctx => ctx.scene.enter('host'));
 
 bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
