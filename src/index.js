@@ -35,6 +35,11 @@ bot.hears(/.*/, ctx => {
             console.log(`Forwarded to author`);
         } else {
             const { ADMIN_GROUP_CHAT_ID } = process.env;
+            console.log(
+                ADMIN_GROUP_CHAT_ID,
+                ctx.message.chat.id,
+                ctx.message.message_id,
+            );
             telegram.forwardMessage(
                 ADMIN_GROUP_CHAT_ID,
                 ctx.message.chat.id,
