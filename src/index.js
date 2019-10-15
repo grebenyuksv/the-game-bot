@@ -13,15 +13,20 @@ const telegram = new Telegram(BOT_TOKEN);
 
 //  remember to duplicate your updates via botfather's /setcommands!
 const commands = {
-    train: 'Дізнатися, куди можна сходити зіграти найближчим часом',
-    host: 'Провести гру для своїх друзів, студентів, школярів, інопланетян',
-    register: 'Зареєструватися на The Game III',
-    ask: 'Поставити питання іншого характеру',
+    train:
+        'підказати, куди можна сходити зіграти найближчим часом, щоб потренуватись',
+    host:
+        'допомогти з проведенням гри для своїх друзів, студентів, школярів, інопланетян чи серед кого ви там хочете популяризувати інтелектуалочки',
+    register:
+        'допомогти зареєструватися на «The Game III» (зараз доступна можливість зареєструватися безкоштовно)',
+    ask: 'відповісти на питання іншого характеру',
 };
 
-const startMessage = `Ласкаво прошу! Відповідайте мені на питання, або ж зробіть от що: \n${Object.keys(
+const startMessage = `Вітаю! Якщо ви хочете відповісти на останнє поставлене питання, будь ласка, пишіть відразу в чат нижче. Ще я вмію таке:\n\n${Object.keys(
     commands,
-).map(key => `\n/${key} — ${commands[key]}`)}`;
+)
+    .map(key => `/${key} — ${commands[key]}`)
+    .join(';\n')}`;
 
 bot.start(ctx => ctx.reply(startMessage));
 
@@ -70,9 +75,7 @@ stage.register(
 );
 bot.command('host', ctx => ctx.scene.enter('host'));
 
-stage.register(
-    createSingleQuestionScene('ask', 'Напишіть питання:'),
-);
+stage.register(createSingleQuestionScene('ask', 'Напишіть питання:'));
 bot.command('ask', ctx => ctx.scene.enter('ask'));
 
 bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
