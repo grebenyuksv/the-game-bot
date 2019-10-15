@@ -80,7 +80,7 @@ bot.command('ask', ctx => ctx.scene.enter('ask'));
 
 bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
-bot.hears(/.*/, ctx => {
+const handleStickerOrAnyMessage = ctx => {
     try {
         console.log(JSON.stringify(ctx.message, null, 2));
         const repliedMessage = ctx.message.reply_to_message;
@@ -90,10 +90,17 @@ bot.hears(/.*/, ctx => {
         if (shouldForwardToClient) {
             // todo cosmetic reply not send
             // todo cosmetic reply to group
-            telegram.sendMessage(
-                repliedMessage.forward_from.id,
-                ctx.message.text,
-            );
+            if (ctx.message.text) {
+                telegram.sendMessage(
+                    repliedMessage.forward_from.id,
+                    ctx.message.text,
+                );
+            } else if (ctx.message.sticker) {
+                telegram.sendSticker(
+                    repliedMessage.forward_from.id,
+                    ctx.message.sticker.file_id,
+                );
+            }
             console.log(`Forwarded to author`);
         } else {
             telegram.forwardMessage(
@@ -106,6 +113,9 @@ bot.hears(/.*/, ctx => {
     } catch (e) {
         console.error(e);
     }
-});
+};
+
+bot.on('sticker', handleStickerOrAnyMessage);
+bot.hears(/.*/, handleStickerOrAnyMessage);
 
 bot.launch();
