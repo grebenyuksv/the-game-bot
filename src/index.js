@@ -7,9 +7,15 @@ const Stage = require('telegraf/stage');
 const Scene = require('telegraf/scenes/base');
 const WizardScene = require('telegraf/scenes/wizard');
 
-const { BOT_TOKEN, ADMIN_GROUP_CHAT_ID } = process.env;
+const { BOT_TOKEN, ADMIN_GROUP_CHAT_ID, SENTRY_DSN } = process.env;
 const bot = new Telegraf(BOT_TOKEN);
 const telegram = new Telegram(BOT_TOKEN);
+
+const Sentry = require('@sentry/node');
+Sentry.init({
+    dsn: SENTRY_DSN,
+});
+Sentry.captureMessage('launched');
 
 //  remember to duplicate your updates via botfather's /setcommands!
 const commands = {
@@ -112,6 +118,7 @@ const handleStickerOrAnyMessage = ctx => {
         }
     } catch (e) {
         console.error(e);
+        Sentry.captureException(e);
     }
 };
 
