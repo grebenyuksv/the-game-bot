@@ -88,6 +88,7 @@ bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
 const handleStickerOrAnyMessage = ctx => {
     try {
+        Sentry.captureMessage(JSON.stringify(ctx.message));
         console.log(JSON.stringify(ctx.message, null, 2));
         const repliedMessage = ctx.message.reply_to_message;
         //  todo fix only forward admins' messages to clients
