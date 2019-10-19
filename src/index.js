@@ -18,8 +18,12 @@ Sentry.init({
 Sentry.captureMessage('launched');
 
 bot.use((ctx, next) => {
-    console.log(JSON.stringify(ctx.message, null, 2));
-    Sentry.captureMessage(JSON.stringify(ctx.message));
+    const { message } = ctx;
+    console.log(JSON.stringify(message, null, 2));
+    Sentry.withScope(function(scope) {
+        scope.setFingerprint(message.message_id);
+        Sentry.captureMessage(JSON.stringify(message));
+    });
     return next(ctx);
 });
 
