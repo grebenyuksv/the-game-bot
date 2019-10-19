@@ -18,6 +18,7 @@ Sentry.init({
 Sentry.captureMessage('launched');
 
 bot.use((ctx, next) => {
+    console.log(JSON.stringify(ctx.message, null, 2));
     Sentry.captureMessage(JSON.stringify(ctx.message));
     return next(ctx);
 });
@@ -52,7 +53,6 @@ const createSingleQuestionScene = (commandName, question) => {
     const scene = new Scene(commandName);
     scene.enter(ctx => ctx.reply(question));
     scene.hears(/.*/, async ctx => {
-        console.log(JSON.stringify(ctx.message, null, 2));
         const { first_name, last_name } = ctx.message.from;
         const message = await telegram.sendMessage(
             ADMIN_GROUP_CHAT_ID,
@@ -92,7 +92,6 @@ bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
 const handleStickerOrAnyMessage = ctx => {
     try {
-        console.log(JSON.stringify(ctx.message, null, 2));
         const repliedMessage = ctx.message.reply_to_message;
         //  todo fix only forward admins' messages to clients
         const shouldForwardToClient =
