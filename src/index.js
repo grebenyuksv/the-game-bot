@@ -52,17 +52,16 @@ const createSingleQuestionScene = (commandName, question) => {
     const scene = new Scene(commandName);
     scene.enter(ctx => ctx.reply(question));
     scene.hears(/.*/, async ctx => {
+        console.log(JSON.stringify(ctx.message, null, 2));
+        const { first_name, last_name } = ctx.message.from;
+        const message = await telegram.sendMessage(
+            ADMIN_GROUP_CHAT_ID,
+            `/${commandName} від ${first_name} ${last_name}:`,
+        );
         const forwardMessage = await telegram.forwardMessage(
             ADMIN_GROUP_CHAT_ID,
             ctx.message.chat.id,
             ctx.message.message_id,
-        );
-        const message = await telegram.sendMessage(
-            ADMIN_GROUP_CHAT_ID,
-            `Там була команда "${commands[commandName]}". Уважно: відповідайте саме на ТЕ повідомлення, не на це. Цей костиль я зробив, тому що не знайшов у API телеграма іншого способу дописати в те повідомлення команду, яку юзер обрав.`,
-            {
-                reply_to_message_id: forwardMessage.message_id,
-            },
         );
         console.log(`Forwarded to admins`);
         ctx.scene.leave();
