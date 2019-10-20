@@ -7,6 +7,8 @@ const Stage = require('telegraf/stage');
 const Scene = require('telegraf/scenes/base');
 const WizardScene = require('telegraf/scenes/wizard');
 
+const emojiRegexp = require('./emoji-regexp');
+
 const { BOT_TOKEN, ADMIN_GROUP_CHAT_ID, SENTRY_DSN } = process.env;
 const bot = new Telegraf(BOT_TOKEN);
 const telegram = new Telegram(BOT_TOKEN);
@@ -94,32 +96,45 @@ bot.command('ask', ctx => ctx.scene.enter('ask'));
 
 bot.command('register', ctx => ctx.reply('bit.ly/thegameukraine'));
 
-const handleStickerOrAnyMessage = ctx => {
+const handleStickerOrAnyMessage = async ctx => {
     try {
-        const repliedMessage = ctx.message.reply_to_message;
+        const { message } = ctx;
+        const repliedMessage = message.reply_to_message;
         //  todo fix only forward admins' messages to clients
         const shouldForwardToClient =
-            ctx.message.chat.id === (repliedMessage && repliedMessage.chat.id);
+            message.chat.id === (repliedMessage && repliedMessage.chat.id);
         if (shouldForwardToClient) {
             // todo cosmetic reply not send
             // todo cosmetic reply to group
-            if (ctx.message.text) {
-                telegram.sendMessage(
+            if (message.text) {
+                await telegram.sendMessage(
                     repliedMessage.forward_from.id,
-                    ctx.message.text,
+                    message.text,
                 );
-            } else if (ctx.message.sticker) {
-                telegram.sendSticker(
+            } else if (message.sticker) {
+                await telegram.sendSticker(
                     repliedMessage.forward_from.id,
-                    ctx.message.sticker.file_id,
+                    message.sticker.file_id,
                 );
             }
             console.log(`Forwarded to author`);
         } else {
-            telegram.forwardMessage(
+            if (
+                message.sticker ||
+                (message.text &&
+                    message.text.length <= 2 &&
+                    message.text.match(emojiRegexp))
+            ) {
+                const { first_name, last_name } = message.from;
+                await telegram.sendMessage(
+                    ADMIN_GROUP_CHAT_ID,
+                    `Від ${first_name} ${last_name}:`,
+                );
+            }
+            await telegram.forwardMessage(
                 ADMIN_GROUP_CHAT_ID,
-                ctx.message.chat.id,
-                ctx.message.message_id,
+                message.chat.id,
+                message.message_id,
             );
             console.log(`Forwarded to admins`);
         }
