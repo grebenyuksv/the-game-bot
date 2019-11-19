@@ -20,13 +20,18 @@ Sentry.init({
 Sentry.captureMessage('launched');
 
 bot.use((ctx, next) => {
-    const { message } = ctx;
-    console.log(JSON.stringify(message, null, 2));
-    Sentry.withScope(function(scope) {
-        scope.setFingerprint(message.message_id);
-        Sentry.captureMessage(JSON.stringify(message));
-    });
-    return next(ctx);
+    try {
+        const { message } = ctx;
+        console.log(ctx.updateType, JSON.stringify(message, null, 2));
+        Sentry.withScope(function(scope) {
+            scope.setFingerprint(message.message_id);
+            Sentry.captureMessage(JSON.stringify(message));
+        });
+        return next(ctx);
+    } catch (e) {
+        console.error(e);
+        Sentry.captureException(e);
+    }
 });
 
 //  remember to duplicate your updates via botfather's /setcommands!
